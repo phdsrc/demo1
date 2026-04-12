@@ -15,7 +15,7 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+    ->use(\Tests\InitializeDatabase::class)
     ->in('Feature');
 
 /*
@@ -29,8 +29,67 @@ pest()->extend(TestCase::class)
 |
 */
 
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
+expect()->extend('hasApiStatus', function ($code) {
+
+    /** @var \Illuminate\Testing\TestResponse $response */
+    $response = $this->value;
+    $response->assertStatus($code);
+    return $this;
+});
+
+expect()->extend('hasApiBody', function (string $expected, $ignore) {
+    /** @var \Illuminate\Testing\TestResponse $response */
+    $response = $this->value;
+
+    $generated = collect($response->json())
+        ->sortKeysRecursive()
+        ->toArray();
+
+    $fixed = collect(json_decode($expected, true))
+        ->sortKeysRecursive()
+        ->toArray();
+
+    if ($ignore) {
+        foreach ($ignore as $path => $fields) {
+            if (is_array($fields)) {
+                foreach ($fields as $field) {
+                    data_forget($generated, $path . '.' . $field);
+                    data_forget($fixed, $path . '.' . $field);
+                }
+            } else {
+                data_forget($generated, $fields);
+                data_forget($fixed, $fields);
+
+            }
+        }
+    }
+    expect(count($generated))->toBeGreaterThan(0)
+        ->and($generated)->toBe($fixed);
+
+    return $this;
+});
+
+expect()->extend('hasApiKey', function (string $key) {
+    /** @var \Illuminate\Testing\TestResponse $response */
+    $response = $this->value;
+
+    $resolved = data_get($response->json(), $key, '__NULL__');
+    if ($resolved === '__NULL__') {
+        \PHPUnit\Framework\Assert::assertTrue(false, '"'. $key.'" does not exist in '. json_encode($response->json()));
+    } else {
+        \PHPUnit\Framework\Assert::assertTrue(true);
+    }
+
+    return $this;
+});
+
+expect()->extend('hasApiValue', function (string $key, string $expected) {
+    /** @var \Illuminate\Testing\TestResponse $response */
+    $response = $this->value;
+
+    expect(data_get($response->json(), $key))->toBe($expected);
+
+    return $this;
 });
 
 /*
@@ -44,7 +103,32 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+
+\Illuminate\Support\Collection::macro('sortKeysRecursive', function () {
+    $items = $this->all();
+
+    $sortRecursive = function (&$array) use (&$sortRecursive) {
+        ksort($array);
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                $sortRecursive($value);
+            }
+        }
+    };
+
+    $sortRecursive($items);
+
+    return new \Illuminate\Support\Collection($items);
+});
+
+
+function tdump(mixed $data)
 {
-    // ..
+    if (is_array($data) || is_object($data)) {
+        print_r(json_encode($data, JSON_PRETTY_PRINT));
+    } else {
+        print_r($data);
+    }
+    print "\n";
+    expect(1)->toBe(0);
 }
