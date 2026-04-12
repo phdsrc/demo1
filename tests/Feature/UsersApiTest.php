@@ -30,6 +30,12 @@ describe('api: users.store', function () {
     it('creates user object', function () {
 
         $input = [
+            'name' => 'Winston Buckridge',
+            'first_name' => 'Winston',
+            'last_name' => 'Buckridge',
+            'role' => 'MANAGER',
+            'status' => 'ACTIVE',
+            'email' => 'morissette.jules@example.net',
         ];
 
         expect(
@@ -38,6 +44,15 @@ describe('api: users.store', function () {
             ->hasApiStatus(201)
             ->hasApiBody(<<<JSON
             {
+                "first_name": "Winston",
+                "last_name": "Buckridge",
+                "email": "morissette.jules@example.net",
+                "role": "MANAGER",
+                "status": "ACTIVE",
+                "name": "Winston Buckridge",
+                "updated_at": "2026-04-12T22:16:55.000000Z",
+                "created_at": "2026-04-12T22:16:55.000000Z",
+                "id": 101
             }
             JSON,
             ignore: [
@@ -53,6 +68,12 @@ describe('api: users.update', function () {
     it('updates user object', function () {
 
         $input = [
+            'name' => 'Winston Buckridge',
+            'first_name' => 'Winston',
+            'last_name' => 'Buckridge',
+            'role' => 'MANAGER',
+            'status' => 'ACTIVE',
+            'email' => 'morissette.jules@example.net',
         ];
 
         $user = expect(
@@ -61,6 +82,15 @@ describe('api: users.update', function () {
             ->hasApiStatus(201)
             ->hasApiBody(<<<JSON
             {
+                "first_name": "Winston",
+                "last_name": "Buckridge",
+                "email": "morissette.jules@example.net",
+                "role": "MANAGER",
+                "status": "ACTIVE",
+                "name": "Winston Buckridge",
+                "updated_at": "2026-04-12T22:16:55.000000Z",
+                "created_at": "2026-04-12T22:16:55.000000Z",
+                "id": 101
             }
             JSON,
                 ignore: [
