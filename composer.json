@@ -54,7 +54,7 @@
             "@php -r \"file_exists('compose.yaml') || copy('compose.yaml.example', 'compose.yaml');\""
         ],
         "dev-install": [
-            "@php artisan migrate:fresh --step && @php artisan db:seed --class=DatabaseSeeder",
+            "@php artisan migrate:fresh --step && php artisan db:seed --class=DatabaseSeeder",
             "npm install --ignore-scripts",
             "npm run build"
         ],
