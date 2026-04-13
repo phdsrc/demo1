@@ -78,7 +78,7 @@ Installation
 
 Misc Commands
 ```bash
-sail pgsql
+sail psql
 sail artisan tinker
 sail ps
 sail logs
